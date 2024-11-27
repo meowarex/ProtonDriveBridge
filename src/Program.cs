@@ -37,6 +37,13 @@ namespace ProtonDriveBridge
             // Add CSS styling
             cssProvider = new CssProvider();
             ApplyTheme(isDarkMode);
+            
+            // Add this line to make the CSS take effect
+            StyleContext.AddProviderForScreen(
+                Gdk.Screen.Default,
+                cssProvider,
+                StyleProviderPriority.Application
+            );
 
             // Main container with padding
             var mainBox = new Box(Orientation.Vertical, 0);
