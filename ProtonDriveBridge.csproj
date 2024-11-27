@@ -5,7 +5,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ApplicationIcon>Assets\pdb.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,12 +17,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
-
-  <Target Name="ConvertPngToIco" BeforeTargets="BeforeBuild">
-    <ConvertImage 
-      Source="Assets/pdb.png"
-      Destination="Assets/pdb.ico"
-      Condition="!Exists('Assets/pdb.ico')" />
-  </Target>
 
 </Project> 
