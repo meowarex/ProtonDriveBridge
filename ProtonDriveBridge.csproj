@@ -5,11 +5,25 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ApplicationIcon>sync.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\pdb.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="GtkSharp" Version="3.24.24.95" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\pdb.png" />
+    <Resource Include="Assets\pdb.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <Target Name="ConvertPngToIco" BeforeTargets="BeforeBuild">
+    <ConvertImage 
+      Source="Assets/pdb.png"
+      Destination="Assets/pdb.ico"
+      Condition="!Exists('Assets/pdb.ico')" />
+  </Target>
 
 </Project> 
