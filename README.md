@@ -1,6 +1,6 @@
-# GTK# File Synchronizer
+# ProtonDriveBridge
 
-A simple GTK# application that synchronizes files between source and target folders with verbose output.
+A GTK# application that bridges files between local folders with verbose output.
 
 ## Features
 - GTK# based GUI for folder selection
@@ -24,3 +24,11 @@ A simple GTK# application that synchronizes files between source and target fold
 3. Select target folder using the "Browse" button
 4. Click "Start Sync" to begin the synchronization process
 5. Watch the progress in the console window
+
+## Building from Visual Studio
+1. Open ProtonDriveBridge.sln in Visual Studio
+2. Build the solution (F6)
+3. Find the executable in bin/Debug/net6.0 or bin/Release/net6.0
+
+Note: Users need GTK# runtime installed to run the application. Download from:
+https://www.mono-project.com/download/stable/

@@ -16,7 +16,7 @@ class FileSyncApp
         Application.Init();
 
         // Create main window with modern styling
-        window = new Window("File Synchronizer");
+        window = new Window("ProtonDriveBridge");
         window.SetDefaultSize(700, 300);
         window.DeleteEvent += (s, e) => Application.Quit();
         window.WindowPosition = WindowPosition.Center;
@@ -66,8 +66,8 @@ class FileSyncApp
         // Header with title and subtitle
         var headerBox = new Box(Orientation.Vertical, 5);
         var titleLabel = new Label();
-        titleLabel.Markup = "<span size='x-large' weight='bold'>File Synchronizer</span>";
-        var subtitleLabel = new Label("Synchronize files between folders with detailed progress tracking");
+        titleLabel.Markup = "<span size='x-large' weight='bold'>ProtonDriveBridge</span>";
+        var subtitleLabel = new Label("Bridge your files between local folders with detailed progress tracking");
         subtitleLabel.StyleContext.AddClass("dim-label");
         headerBox.PackStart(titleLabel, false, false, 0);
         headerBox.PackStart(subtitleLabel, false, false, 0);
