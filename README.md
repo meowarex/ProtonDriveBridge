@@ -1,34 +1,54 @@
-# ProtonDriveBridge
+# Proton Drive Bridge
 
-A GTK# application that bridges files between local folders with verbose output.
+A modern GTK4 application that helps you synchronize files between local folders, designed to match GNOME's design language.
 
 ## Features
-- GTK# based GUI for folder selection
-- Compares files between source and target directories
-- Copies new or modified files
-- Shows detailed progress in console window
-- Verbose output for each operation
+- Native GTK4 interface following GNOME HIG
+- Dark/Light theme support with system integration
+- Real-time synchronization progress
+- MD5 hash comparison for file changes
+- Detailed debug output view
+- Asynchronous file operations
 
 ## Requirements
-- .NET 6.0 or higher
-- GTK# for .NET
+- Python 3.8 or higher
+- GTK 4.0
+- PyGObject
 
 ## Installation
-1. Install GTK# for .NET from: https://www.mono-project.com/download/stable/
-2. Clone this repository
-3. Build and run the project
+
+1. Install system dependencies:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0
+
+   # Fedora
+   sudo dnf install python3-gobject gtk4
+
+   # Arch Linux
+   sudo pacman -S python-gobject gtk4
+   ```
+
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/proton-drive-bridge.git
+   cd proton-drive-bridge
+   ```
+
+3. Install Python dependencies:
+   ```bash
+   pip install PyGObject
+   ```
 
 ## Usage
-1. Launch the application
-2. Select source folder using the "Browse" button
-3. Select target folder using the "Browse" button
-4. Click "Start Sync" to begin the synchronization process
-5. Watch the progress in the console window
+1. Launch the application:
+   ```bash
+   python3 src/proton_drive_bridge.py
+   ```
 
-## Building from Visual Studio
-1. Open ProtonDriveBridge.sln in Visual Studio
-2. Build the solution (F6)
-3. Find the executable in bin/Debug/net6.0 or bin/Release/net6.0
+2. Select source folder using the folder icon
+3. Select target folder using the folder icon
+4. Click "Start Synchronization" to begin
+5. Watch the progress in the debug view
 
-Note: Users need GTK# runtime installed to run the application. Download from:
-https://www.mono-project.com/download/stable/
+## Project Structure

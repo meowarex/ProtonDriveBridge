@@ -1,0 +1,44 @@
+# Build directories
+build/
+bin/
+obj/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+venv/
+env/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*~
+*.bak
+
+# Distribution / packaging
+dist/
+*.egg-info/
+*.egg
+
+# Compiled files
+*.pyo
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# Logs and databases
+*.log
+*.sqlite 

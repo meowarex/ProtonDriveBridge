@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="MainWindow" parent="GtkApplicationWindow">
+    <property name="title">Proton Drive Bridge</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <!-- Main Content -->
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="margin-start">24</property>
+            <property name="margin-end">24</property>
+            <property name="margin-top">24</property>
+            <property name="margin-bottom">24</property>
+            <property name="spacing">24</property>
+
+            <!-- Folders Section -->
+            <child>
+              <object class="GtkListBox">
+                <property name="selection-mode">none</property>
+                <style>
+                  <class name="boxed-list"/>
+                </style>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <property name="margin-start">18</property>
+                        <property name="margin-end">18</property>
+                        <property name="margin-top">18</property>
+                        <property name="margin-bottom">18</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="label">Source Folder</property>
+                                    <property name="xalign">0</property>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="label">Select the folder to sync from</property>
+                                    <property name="xalign">0</property>
+                                    <style>
+                                      <class name="caption"/>
+                                      <class name="dim-label"/>
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="source_button">
+                                <property name="label">Browse</property>
+                                <style>
+                                  <class name="flat"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="source_entry">
+                            <property name="placeholder-text">Source Folder Path</property>
+                            <property name="editable">false</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <property name="margin-start">18</property>
+                        <property name="margin-end">18</property>
+                        <property name="margin-top">18</property>
+                        <property name="margin-bottom">18</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="label">Target Folder</property>
+                                    <property name="xalign">0</property>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="label">Select the folder to sync to</property>
+                                    <property name="xalign">0</property>
+                                    <style>
+                                      <class name="caption"/>
+                                      <class name="dim-label"/>
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="target_button">
+                                <property name="label">Browse</property>
+                                <style>
+                                  <class name="flat"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="target_entry">
+                            <property name="placeholder-text">Target Folder Path</property>
+                            <property name="editable">false</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Status Label -->
+            <child>
+              <object class="GtkLabel" id="status_label">
+                <property name="label">Ready to sync</property>
+                <style>
+                  <class name="heading"/>
+                </style>
+              </object>
+            </child>
+
+            <!-- Debug Output Section -->
+            <child>
+              <object class="GtkScrolledWindow" id="debug_scroll">
+                <property name="visible">false</property>
+                <property name="vexpand">true</property>
+                <style>
+                  <class name="card"/>
+                </style>
+                <child>
+                  <object class="GtkTextView" id="debug_view">
+                    <property name="editable">false</property>
+                    <property name="wrap-mode">word</property>
+                    <style>
+                      <class name="monospace"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Start Button -->
+            <child>
+              <object class="GtkButton" id="start_button">
+                <property name="label">Start Synchronization</property>
+                <style>
+                  <class name="suggested-action"/>
+                  <class name="pill"/>
+                </style>
+              </object>
+            </child>
+
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface> 
