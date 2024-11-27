@@ -36,37 +36,7 @@ namespace ProtonDriveBridge
 
             // Add CSS styling
             cssProvider = new CssProvider();
-            cssProvider.LoadFromData(@"
-                window {
-                    background-color: #ffffff;
-                }
-                button {
-                    padding: 8px 16px;
-                    border-radius: 8px;
-                    background: linear-gradient(to bottom, #3584e4, #1c71d8);
-                    color: white;
-                    border: none;
-                    margin: 5px;
-                }
-                button:hover {
-                    background: linear-gradient(to bottom, #3584e4, #1a5fb4);
-                }
-                entry {
-                    padding: 8px;
-                    border-radius: 6px;
-                    border: 1px solid #deddda;
-                    margin: 5px;
-                }
-                label {
-                    margin: 5px;
-                }
-            ");
-            
-            StyleContext.AddProviderForScreen(
-                Gdk.Screen.Default,
-                cssProvider,
-                StyleProviderPriority.Application
-            );
+            ApplyTheme(isDarkMode);
 
             // Main container with padding
             var mainBox = new Box(Orientation.Vertical, 0);
@@ -76,14 +46,30 @@ namespace ProtonDriveBridge
             mainBox.MarginBottom = 24;
             window.Add(mainBox);
 
-            // Header with title and subtitle
-            var headerBox = new Box(Orientation.Vertical, 5);
+            // Header with title, subtitle, and theme toggle
+            var headerBox = new Box(Orientation.Horizontal, 5);
+            
+            var titleBox = new Box(Orientation.Vertical, 5);
             var titleLabel = new Label();
             titleLabel.Markup = "<span size='x-large' weight='bold'>ProtonDriveBridge</span>";
             var subtitleLabel = new Label("Bridge your files between local folders with detailed progress tracking");
             subtitleLabel.StyleContext.AddClass("dim-label");
-            headerBox.PackStart(titleLabel, false, false, 0);
-            headerBox.PackStart(subtitleLabel, false, false, 0);
+            titleBox.PackStart(titleLabel, false, false, 0);
+            titleBox.PackStart(subtitleLabel, false, false, 0);
+            
+            // Theme toggle button
+            var themeButton = new Button();
+            themeButton.TooltipText = "Toggle Theme";
+            themeButton.StyleContext.AddClass("theme-toggle");
+            themeButton.Label = isDarkMode ? "🌙" : "☀️";
+            themeButton.Clicked += (s, e) => {
+                isDarkMode = !isDarkMode;
+                themeButton.Label = isDarkMode ? "🌙" : "☀️";
+                ApplyTheme(isDarkMode);
+            };
+
+            headerBox.PackStart(titleBox, true, true, 0);
+            headerBox.PackEnd(themeButton, false, false, 0);
             mainBox.PackStart(headerBox, false, false, 10);
 
             // Source folder selection
@@ -259,6 +245,53 @@ namespace ProtonDriveBridge
                 var hash = md5.ComputeHash(stream);
                 return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
             }
+        }
+
+        private void ApplyTheme(bool isDark)
+        {
+            var themeCSS = @"
+                window {
+                    background-color: " + (isDark ? "#1e1e1e" : "#ffffff") + @";
+                    color: " + (isDark ? "#ffffff" : "#000000") + @";
+                }
+                button {
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    background: " + (isDark ? "linear-gradient(to bottom, #ff69b4, #da1884)" : "linear-gradient(to bottom, #3584e4, #1c71d8)") + @";
+                    color: white;
+                    border: none;
+                    margin: 5px;
+                }
+                button:hover {
+                    background: " + (isDark ? "linear-gradient(to bottom, #ff69b4, #c71585)" : "linear-gradient(to bottom, #3584e4, #1a5fb4)") + @";
+                }
+                button.theme-toggle {
+                    padding: 4px 8px;
+                    background: transparent;
+                    border: 1px solid " + (isDark ? "#ffffff" : "#000000") + @";
+                    color: " + (isDark ? "#ffffff" : "#000000") + @";
+                }
+                button.theme-toggle:hover {
+                    background: " + (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)") + @";
+                }
+                entry {
+                    padding: 8px;
+                    border-radius: 6px;
+                    border: 1px solid " + (isDark ? "#404040" : "#deddda") + @";
+                    background-color: " + (isDark ? "#2d2d2d" : "#ffffff") + @";
+                    color: " + (isDark ? "#ffffff" : "#000000") + @";
+                    margin: 5px;
+                }
+                label {
+                    margin: 5px;
+                    color: " + (isDark ? "#ffffff" : "#000000") + @";
+                }
+                .dim-label {
+                    opacity: 0.8;
+                }
+            ";
+
+            cssProvider.LoadFromData(themeCSS);
         }
     }
 } 
