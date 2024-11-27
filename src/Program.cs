@@ -34,7 +34,7 @@ namespace ProtonDriveBridge
             Application.Init();
 
             // Create main window with modern styling
-            window = new Window("ProtonDriveBridge");
+            window = new Window("Proton DriveBridge");
             window.SetDefaultSize(700, 300);
             window.DeleteEvent += (s, e) => Application.Quit();
             window.WindowPosition = WindowPosition.Center;
@@ -83,8 +83,8 @@ namespace ProtonDriveBridge
             
             var titleBox = new Box(Orientation.Vertical, 5);
             var titleLabel = new Label();
-            titleLabel.Markup = "<span size='x-large' weight='bold'>ProtonDriveBridge</span>";
-            var subtitleLabel = new Label("Bridge your files between local folders with detailed progress tracking");
+            titleLabel.Markup = "<span size='x-large' weight='bold'>Proton Drive Bridge</span>";
+            var subtitleLabel = new Label("Compare & Synchronize your other Cloud Storage with Proton Drive!");
             subtitleLabel.StyleContext.AddClass("dim-label");
             titleBox.PackStart(titleLabel, false, false, 0);
             titleBox.PackStart(subtitleLabel, false, false, 0);
