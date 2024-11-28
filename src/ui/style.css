@@ -24,6 +24,7 @@ windowcontrols > button:hover {
 .header-icon-button {
     margin: 0 20px 0 6px;
     padding: 0;
+    border: 0px;
     background: none;
     min-width: 32px;
     min-height: 32px;

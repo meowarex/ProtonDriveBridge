@@ -19,14 +19,13 @@ class PdbApp(Gtk.Application):
         super().__init__(application_id="org.proton.drive.bridge",
                         flags=Gio.ApplicationFlags.FLAGS_NONE)
         
-        # Set application icon
+        # Load the icon for use in the header button
         version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
-        try:
-            icon = Gtk.IconTheme.get_default()
-            icon.add_search_path("ui/assets")
-            self.props.application_icon = version_icon_path
-        except:
-            print(f"Could not set application icon: {version_icon_path}")
+        self.icon = GdkPixbuf.Pixbuf.new_from_file(version_icon_path)
+        
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+        self.set_app_menu(None)
         
     def do_activate(self):
         # Initialize the GTK Builder
@@ -47,23 +46,21 @@ class PdbApp(Gtk.Application):
         if not self.window:
             raise RuntimeError("main_window not found in UI file!")
             
-        # Set the appropriate icons
-        self.settings_icon = self.builder.get_object("settings_icon")
-        
-        # Load and set the version-specific icon for the header button
-        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
-        icon_pixbuf = GdkPixbuf.Pixbuf.new_from_file(version_icon_path)
-
-        # Scale the icon to fill the button (32x32)
-        scaled_pixbuf = icon_pixbuf.scale_simple(32, 32, GdkPixbuf.InterpType.BILINEAR)
-        self.settings_icon.set_from_pixbuf(scaled_pixbuf)
-        
         # Get the stack and buttons
         self.stack = self.builder.get_object("main_stack")
         self.page1_button = self.builder.get_object("page1_button")
         self.page2_button = self.builder.get_object("page2_button")
         self.url_button1 = self.builder.get_object("url_button1")
         self.url_button2 = self.builder.get_object("url_button2")
+        
+        # Set the appropriate icons
+        self.settings_icon = self.builder.get_object("settings_icon")
+        self.heart_icon = self.builder.get_object("heart_icon")
+        
+        # Load and set the version-specific icon for the header button
+        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
+        icon_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(version_icon_path, 32, 32)
+        self.settings_icon.set_from_pixbuf(icon_pixbuf)
         
         # Connect signals
         self.page1_button.connect("toggled", self.on_page_button_toggled, "page1")
@@ -76,7 +73,7 @@ class PdbApp(Gtk.Application):
         
         # Connect icon button signal
         self.icon_button.connect("clicked", self.on_url_button_clicked, "https://atomix.one")
-            
+        
         # Set the application for the window
         self.window.set_application(self)
         
