@@ -25,6 +25,7 @@ windowcontrols > button:hover {
     margin: 0 20px 0 6px;
     padding: 0;
     background: none;
+    border: 0px;
     min-width: 32px;
     min-height: 32px;
     max-width: 32px;
@@ -98,4 +99,12 @@ stack {
 .custom-button:hover {
     background: linear-gradient(to right, #ff00d9, #ff00ae);
     color: rgb(19, 19, 19);
+}
+
+button.love:hover {
+    background-image: -gtk-icontheme("emblem-favorite-symbolic");
+    background-repeat: no-repeat;
+    background-position: center;
+    -gtk-icon-effect: none;
+    -gtk-icon-palette: warning #ff00ae;
 }

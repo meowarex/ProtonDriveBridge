@@ -74,6 +74,12 @@ class PdbApp(Gtk.Application):
         # Get the icon button
         self.icon_button = self.builder.get_object("icon_button")
         
+        # Create hover controller for icon button
+        hover_controller = Gtk.EventControllerMotion.new()
+        hover_controller.connect("enter", self.on_icon_button_hover_enter)
+        hover_controller.connect("leave", lambda c: self.on_icon_button_hover_leave(c, 0, 0))
+        self.icon_button.add_controller(hover_controller)
+
         # Connect icon button signal
         self.icon_button.connect("clicked", self.on_url_button_clicked, "https://atomix.one")
             
@@ -96,6 +102,12 @@ class PdbApp(Gtk.Application):
         
     def on_url_button_clicked(self, button, url):
         webbrowser.open(url)
+
+    def on_icon_button_hover_enter(self, controller, x, y):
+        self.icon_button.add_css_class("love")
+
+    def on_icon_button_hover_leave(self, controller, x, y):
+        self.icon_button.remove_css_class("love")
 
 if __name__ == "__main__":
     app = PdbApp()
