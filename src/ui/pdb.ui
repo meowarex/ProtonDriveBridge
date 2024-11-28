@@ -29,7 +29,8 @@
                 </child>
                 <child type="overlay">
                   <object class="GtkImage" id="heart_icon">
-                    <property name="icon-name">emblem-favorite-symbolic</property>
+                    <property name="icon-name">love</property>
+                    <property name="pixel-size">16</property>
                     <property name="hexpand">false</property>
                     <property name="vexpand">false</property>
                     <style>

@@ -3,16 +3,71 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gio, Gdk, GdkPixbuf
 import webbrowser
 import os
+import glob
+from PIL import Image
+import io
 
 # Version Configuration
 APP_VERSION = "DEV"  # Can be "DEV", "BETA", or "RELEASE"
 
-# Icon paths
-ICON_PATHS = {
-    "DEV": "ui/assets/bridge-dev.png",
-    "BETA": "ui/assets/bridge-beta.png",
-    "RELEASE": "ui/assets/bridge.png",
-}
+def get_resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for AppImage"""
+    if os.environ.get('APPIMAGE'):
+        # Running from AppImage
+        appdir = os.environ.get('APPDIR', '')
+        if not appdir:
+            mount_dirs = glob.glob('/tmp/.mount_Proton*')
+            if mount_dirs:
+                appdir = mount_dirs[0]
+            else:
+                return relative_path
+        return os.path.join(appdir, 'usr/share', relative_path)
+    else:
+        # Running from development/build environment
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+
+def get_icon_path(version):
+    """Get the correct icon path based on environment"""
+    icon_name = f"bridge-{version.lower()}.png"
+    if os.environ.get('APPIMAGE'):
+        return get_resource_path(f"pdb/assets/{icon_name}")
+    else:
+        return get_resource_path(f"ui/assets/{icon_name}")
+
+def load_pixbuf_safely(path, size=None):
+    """Load a pixbuf with error handling and optional sizing using PIL"""
+    try:
+        if not os.path.isfile(path):
+            print(f"Warning: Icon file not found: {path}")
+            print(f"Current directory: {os.getcwd()}")
+            print(f"Directory contents: {os.listdir(os.path.dirname(path))}")
+            return None
+            
+        # Load image with PIL
+        with Image.open(path) as img:
+            if size:
+                img = img.resize((size, size), Image.Resampling.LANCZOS)
+            
+            # Convert to PNG in memory
+            png_buffer = io.BytesIO()
+            img.save(png_buffer, format='PNG')
+            png_buffer.seek(0)
+            
+            # Load into GdkPixbuf
+            loader = GdkPixbuf.PixbufLoader.new_with_type('png')
+            loader.write(png_buffer.read())
+            loader.close()
+            
+            return loader.get_pixbuf()
+            
+    except Exception as e:
+        print(f"Error loading image {path}: {e}")
+        print(f"File exists: {os.path.exists(path)}")
+        print(f"File permissions: {oct(os.stat(path).st_mode)[-3:]}")
+        print(f"File size: {os.path.getsize(path)}")
+        print(f"File contents (first 16 bytes): {open(path, 'rb').read(16)}")
+        return None
 
 class PdbApp(Gtk.Application):
     def __init__(self):
@@ -20,8 +75,10 @@ class PdbApp(Gtk.Application):
                         flags=Gio.ApplicationFlags.FLAGS_NONE)
         
         # Load the icon for use in the header button
-        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
-        self.icon = GdkPixbuf.Pixbuf.new_from_file(version_icon_path)
+        version_icon_path = get_icon_path(APP_VERSION)
+        self.icon = load_pixbuf_safely(version_icon_path)
+        if not self.icon:
+            print(f"Warning: Failed to load application icon from {version_icon_path}")
         
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -30,14 +87,23 @@ class PdbApp(Gtk.Application):
     def do_activate(self):
         # Initialize the GTK Builder
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("ui/pdb.ui")
+        self.builder.add_from_file(get_resource_path("ui/pdb.ui"))
 
         # Load CSS
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_path("ui/style.css")
+        css_provider.load_from_path(get_resource_path("ui/style.css"))
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
             css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        # Load window controls CSS
+        wc_provider = Gtk.CssProvider()
+        wc_provider.load_from_path(get_resource_path("ui/window-controls.css"))
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            wc_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
@@ -58,9 +124,20 @@ class PdbApp(Gtk.Application):
         self.heart_icon = self.builder.get_object("heart_icon")
         
         # Load and set the version-specific icon for the header button
-        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
-        icon_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(version_icon_path, 32, 32)
-        self.settings_icon.set_from_pixbuf(icon_pixbuf)
+        version_icon_path = get_icon_path(APP_VERSION)
+        icon_pixbuf = load_pixbuf_safely(version_icon_path, 32)
+        if icon_pixbuf:
+            self.settings_icon.set_from_pixbuf(icon_pixbuf)
+        else:
+            print(f"Warning: Failed to load header icon from {version_icon_path}")
+        
+        # Load and set the heart icon
+        heart_icon_path = get_resource_path("ui/assets/heart.png")
+        heart_pixbuf = load_pixbuf_safely(heart_icon_path, 16)
+        if heart_pixbuf:
+            self.heart_icon.set_from_pixbuf(heart_pixbuf)
+        else:
+            print(f"Warning: Failed to load heart icon from {heart_icon_path}")
         
         # Connect signals
         self.page1_button.connect("toggled", self.on_page_button_toggled, "page1")

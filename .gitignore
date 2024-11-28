@@ -1,25 +1,24 @@
 # Build directories
 build/
-bin/
-obj/
+dist/
+AppDir/
 
-# Python cache files
+# AppImage files
+*.AppImage
+appimagetool*
+
+# PyInstaller files
+*.spec
+
+# Python cache
 __pycache__/
 *.py[cod]
-*$py.class
 
-# IDE specific files
+# IDE files
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Environment files
-.env
-venv/
-env/
-
-# OS specific files
+# System files
 .DS_Store
 Thumbs.db
 
@@ -27,18 +26,10 @@ Thumbs.db
 *~
 *.bak
 
-# Distribution / packaging
-dist/
-*.egg-info/
-*.egg
+# Environment files
+venv/
+env/
 
-# Compiled files
-*.pyo
-*.pyd
-*.so
-*.dll
-*.dylib
-
-# Logs and databases
+# OS specific files
 *.log
 *.sqlite 
