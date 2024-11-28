@@ -13,25 +13,17 @@
         <!-- Left Side Icon -->
         <child type="start">
           <object class="GtkButton" id="icon_button">
+            <property name="width-request">32</property>
+            <property name="height-request">32</property>
+            <property name="halign">start</property>
             <child>
               <object class="GtkOverlay">
-                <!-- Settings Icon (Default) -->
                 <child>
                   <object class="GtkImage" id="settings_icon">
-                    <property name="icon-name">preferences-system-symbolic</property>
-                    <property name="pixel-size">16</property>
+                    <property name="hexpand">false</property>
+                    <property name="vexpand">false</property>
                     <style>
                       <class name="visible-icon"/>
-                    </style>
-                  </object>
-                </child>
-                <!-- Heart Icon (On Hover) -->
-                <child type="overlay">
-                  <object class="GtkImage" id="heart_icon">
-                    <property name="icon-name">emblem-favorite-symbolic</property>
-                    <property name="pixel-size">16</property>
-                    <style>
-                      <class name="hidden-icon"/>
                     </style>
                   </object>
                 </child>

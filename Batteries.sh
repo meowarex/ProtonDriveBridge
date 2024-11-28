@@ -4,6 +4,7 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+GREY='\033[1;30m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}Installing Proton Drive Bridge dependencies...${NC}"
@@ -67,7 +68,8 @@ echo -e "${YELLOW}Installing Python packages...${NC}"
 pip3 install --user PyGObject
 
 echo -e "${GREEN}Dependencies installation completed!${NC}"
-echo -e "You can now run ${YELLOW}./Build.sh${NC} to build the application." \
+echo -e "You can now run ${YELLOW}./Build.sh${NC} to build the application."
+echo -e " " \
 
 # Ask if user wants to run Build.sh
 read -p "Do you want to run Build.sh now? (y/n) " choice

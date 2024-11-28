@@ -1,12 +1,32 @@
 import gi
 gi.require_version("Gtk", "4.0")
-from gi.repository import Gtk, Gio, Gdk
+from gi.repository import Gtk, Gio, Gdk, GdkPixbuf
 import webbrowser
+import os
+
+# Version Configuration
+APP_VERSION = "DEV"  # Can be "DEV", "BETA", or "RELEASE"
+
+# Icon paths
+ICON_PATHS = {
+    "DEV": "ui/assets/bridge-dev.png",
+    "BETA": "ui/assets/bridge-beta.png",
+    "RELEASE": "ui/assets/bridge.png",
+}
 
 class PdbApp(Gtk.Application):
     def __init__(self):
         super().__init__(application_id="org.proton.drive.bridge",
                         flags=Gio.ApplicationFlags.FLAGS_NONE)
+        
+        # Set application icon
+        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
+        try:
+            icon = Gtk.IconTheme.get_default()
+            icon.add_search_path("ui/assets")
+            self.props.application_icon = version_icon_path
+        except:
+            print(f"Could not set application icon: {version_icon_path}")
         
     def do_activate(self):
         # Initialize the GTK Builder
@@ -27,6 +47,17 @@ class PdbApp(Gtk.Application):
         if not self.window:
             raise RuntimeError("main_window not found in UI file!")
             
+        # Set the appropriate icons
+        self.settings_icon = self.builder.get_object("settings_icon")
+        
+        # Load and set the version-specific icon for the header button
+        version_icon_path = os.path.join(ICON_PATHS[APP_VERSION])
+        icon_pixbuf = GdkPixbuf.Pixbuf.new_from_file(version_icon_path)
+
+        # Scale the icon to fill the button (32x32)
+        scaled_pixbuf = icon_pixbuf.scale_simple(32, 32, GdkPixbuf.InterpType.BILINEAR)
+        self.settings_icon.set_from_pixbuf(scaled_pixbuf)
+        
         # Get the stack and buttons
         self.stack = self.builder.get_object("main_stack")
         self.page1_button = self.builder.get_object("page1_button")
