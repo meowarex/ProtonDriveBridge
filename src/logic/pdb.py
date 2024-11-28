@@ -11,19 +11,10 @@ import io
 APP_VERSION = "DEV"  # Can be "DEV", "BETA", or "RELEASE"
 
 def get_resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for AppImage"""
-    if os.environ.get('APPIMAGE'):
-        # Running from AppImage
-        appdir = os.environ.get('APPDIR', '')
-        if not appdir:
-            mount_dirs = glob.glob('/tmp/.mount_Proton*')
-            if mount_dirs:
-                appdir = mount_dirs[0]
-            else:
-                return relative_path
-        return os.path.join(appdir, 'usr/share', relative_path)
-    else:
-        # Running from development/build environment
+    """Get absolute path to resource"""
+    if os.path.exists("/app"):  # Running in Flatpak
+        return os.path.join("/app/share/proton-drive-bridge", relative_path)
+    else:  # Running in development
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(base_path, relative_path)
 

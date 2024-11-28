@@ -7,159 +7,179 @@ YELLOW='\033[1;33m'
 GREY='\033[1;30m'
 NC='\033[0m' # No Color
 
-# Create build directory if it doesn't exist
-mkdir -p build/logic
-mkdir -p build/ui
-echo -e "${GREEN}Created build directory..${NC}"
+# Function to set full permissions for the entire project
+set_project_permissions() {
+    echo -e "${YELLOW}Setting project-wide permissions...${NC}"
+    
+    # Set permissions for all directories
+    sudo find . -type d -exec chmod 777 {} \;
+    echo -e "${GREY}Set directory permissions (777)${NC}"
+    
+    # Set permissions for all files
+    sudo find . -type f -exec chmod 666 {} \;
+    echo -e "${GREY}Set file permissions (666)${NC}"
+    
+    # Make scripts executable
+    sudo find . -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod 777 {} \;
+    echo -e "${GREY}Made scripts executable (777)${NC}"
+    
+    # Set ownership to current user
+    sudo chown -R $USER:$USER .
+    echo -e "${GREY}Set ownership to current user${NC}"
+    
+    echo -e "${GREEN}Project permissions set!${NC}"
+}
 
-chmod -R 755 build/
-echo -e "${GREEN}Set permissions for build directory..${NC}"
+# Set permissions for the entire project first
+set_project_permissions
+
+# Function to set permissions recursively
+set_permissions() {
+    local path=$1
+    # Create parent directories if they don't exist
+    mkdir -p "$path"
+    
+    # Set all permissions to 777/666
+    find "$path" -type d -exec chmod 777 {} \;
+    find "$path" -type f -exec chmod 666 {} \;
+    find "$path" -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod 777 {} \;
+    
+    echo -e "${GREY}Set permissions for ${path}${NC}"
+}
+
+# Create build directory if it doesn't exist and set permissions
+rm -rf build/  # Clean start
+mkdir -p build/{logic,ui,flatpak}
+set_permissions build/
+echo -e "${GREEN}Created build directory with full permissions..${NC}"
 
 # Copy files to build directory
 cp src/logic/pdb.py build/logic/
 echo -e "${YELLOW}Copied logic files..${NC}"
 cp src/ui/pdb.ui build/ui/
-echo -e "${YELLOW}Copied UI Logic files..${NC}"
 cp src/ui/style.css build/ui/
-echo -e "${YELLOW}Copied UI style files..${NC}"
-# Make the program executable
-chmod +x build/logic/pdb.py
+cp src/ui/window-controls.css build/ui/
+cp -r src/ui/assets build/ui/
+set_permissions build/
+echo -e "${YELLOW}Copied UI files..${NC}"
 
-echo -e "${GREEN}Build complete!${NC}"
-echo " "
+# Create Flatpak files
+echo -e "${YELLOW}Creating Flatpak files...${NC}"
 
-# Run the program
-read -p "Would you like to run the application? (y/n) " run_choice
-case "$run_choice" in
-  y|Y )
-    echo -e "${GREEN}Starting application...${NC}"
-    cd build
-    python3 logic/pdb.py
-    ;;
-esac
+# Create Flatpak directory structure
+mkdir -p build/flatpak/files/src/{logic,ui}
+set_permissions build/flatpak
 
-# After program exits, ask about AppImage compilation
-echo " "
-read -p "Would you like to create an AppImage? (y/n) " compile_choice
-case "$compile_choice" in
-  y|Y )
-    cd ..  # Go back to project root
-    echo -e "${YELLOW}Creating AppImage...${NC}"
-    
-    # Create AppDir structure
-    mkdir -p AppDir/usr/{bin,lib,share/{applications,icons/hicolor/256x256/apps,ui,pdb/assets,icons/hicolor/scalable/actions}}
-    
-    # Install Python and GTK dependencies to AppDir
-    python3 -m pip install --target=AppDir/usr/lib/python3/dist-packages PyGObject Pillow
-    
-    # Copy system GTK libraries and icons
-    cp -L /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so* AppDir/usr/lib/
-    cp -L /usr/lib/x86_64-linux-gnu/libpango-1.0.so* AppDir/usr/lib/
-    cp -L /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so* AppDir/usr/lib/
-    cp -L /usr/lib/x86_64-linux-gnu/libpangoft2-1.0.so* AppDir/usr/lib/
-    
-    # Copy icon theme files
-    cp -r /usr/share/icons/Adwaita AppDir/usr/share/icons/
-    cp /usr/share/icons/hicolor/scalable/actions/love* AppDir/usr/share/icons/hicolor/scalable/actions/
-    
-    # Copy GDK-Pixbuf loaders and cache
-    mkdir -p AppDir/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0
-    cp -r /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/* AppDir/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/
-    
-    # Update the loader cache for the AppDir
-    export GDK_PIXBUF_MODULEDIR="./usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/"
-    cd AppDir
-    gdk-pixbuf-query-loaders > usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache
-    cd ..
+# Copy source files to Flatpak directory
+cp -r src/logic/* build/flatpak/files/src/logic/
+cp -r src/ui/* build/flatpak/files/src/ui/
+set_permissions build/flatpak/files
 
-    # Copy application files
-    cp -r build/logic AppDir/usr/bin/
-    cp build/ui/pdb.ui AppDir/usr/share/ui/
-    cp build/ui/style.css AppDir/usr/share/ui/
-    cp src/ui/window-controls.css AppDir/usr/share/ui/
-    
-    # Copy assets
-    cp src/ui/assets/* AppDir/usr/share/pdb/assets/
-    mkdir -p AppDir/usr/share/ui/assets/window-controls
-    cp src/ui/assets/window-controls/* AppDir/usr/share/ui/assets/window-controls/
-    
-    # Verify file permissions and existence
-    echo -e "${GREY}Verifying files...${NC}"
-    for file in AppDir/usr/share/pdb/assets/*; do
-        if [ -f "$file" ]; then
-            echo -e "${GREY}Asset exists: $file${NC}"
-            chmod 644 "$file"
-        fi
-    done
-    
-    for file in AppDir/usr/share/ui/*; do
-        if [ -f "$file" ]; then
-            echo -e "${GREY}UI file exists: $file${NC}"
-            chmod 644 "$file"
-        fi
-    done
+# Create manifest file
+cat > build/flatpak/org.proton.drive.bridge.yml << EOL
+app-id: org.proton.drive.bridge
+runtime: org.gnome.Platform
+runtime-version: '45'
+sdk: org.gnome.Sdk
+command: proton-drive-bridge
 
-    # Create AppRun script
-    cat > AppDir/AppRun << EOL
-#!/bin/bash
-SELF=\$(readlink -f "\$0")
-HERE=\${SELF%/*}
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --share=network
+  - --filesystem=home
 
-# Add Python paths
-export PYTHONPATH="\${HERE}/usr/lib/python3/dist-packages:\${HERE}/usr/share"
-export LD_LIBRARY_PATH="\${HERE}/usr/lib:\${LD_LIBRARY_PATH}"
-export XDG_DATA_DIRS="\${HERE}/usr/share:\${XDG_DATA_DIRS}"
-export GTK_THEME=Adwaita:dark
-export APPIMAGE=1
-export APPDIR="\${HERE}"
-
-# Debug info
-echo "Content of \${HERE}/usr/share/pdb/assets:"
-ls -la \${HERE}/usr/share/pdb/assets
-echo "Content of \${HERE}/usr/share/ui:"
-ls -la \${HERE}/usr/share/ui
-
-# Execute the application
-cd "\${HERE}"
-python3 usr/bin/logic/pdb.py "\$@"
+modules:
+  - name: proton-drive-bridge
+    buildsystem: simple
+    build-commands:
+      # Create directories
+      - mkdir -p /app/bin
+      - mkdir -p /app/share/applications
+      - mkdir -p /app/share/icons/hicolor/256x256/apps
+      - mkdir -p /app/share/proton-drive-bridge/logic
+      - mkdir -p /app/share/proton-drive-bridge/ui/assets
+      
+      # Copy files
+      - cp files/src/logic/pdb.py /app/share/proton-drive-bridge/logic/
+      - cp files/src/ui/pdb.ui /app/share/proton-drive-bridge/ui/
+      - cp files/src/ui/style.css /app/share/proton-drive-bridge/ui/
+      - cp files/src/ui/window-controls.css /app/share/proton-drive-bridge/ui/
+      - cp -r files/src/ui/assets/* /app/share/proton-drive-bridge/ui/assets/
+      
+      # Install launcher
+      - install -Dm755 files/proton-drive-bridge /app/bin/proton-drive-bridge
+      
+      # Install desktop file and icon
+      - install -Dm644 files/org.proton.drive.bridge.desktop /app/share/applications/
+      - install -Dm644 files/src/ui/assets/bridge-dev.png /app/share/icons/hicolor/256x256/apps/org.proton.drive.bridge.png
+    sources:
+      - type: dir
+        path: files
 EOL
 
-    chmod +x AppDir/AppRun
+# Create launcher script
+cat > build/flatpak/files/proton-drive-bridge << EOL
+#!/bin/bash
+exec python3 /app/share/proton-drive-bridge/logic/pdb.py "\$@"
+EOL
 
-    # Download appimagetool if not present
-    if [ ! -f appimagetool-x86_64.AppImage ]; then
-        wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-        chmod +x appimagetool-x86_64.AppImage
-    fi
+# Create desktop entry
+cat > build/flatpak/files/org.proton.drive.bridge.desktop << EOL
+[Desktop Entry]
+Name=Proton Drive Bridge
+Comment=Proton Drive Bridge Application
+Exec=proton-drive-bridge
+Icon=org.proton.drive.bridge
+Type=Application
+Categories=Utility;
+EOL
 
-    # Create the AppImage with verbose output
-    echo -e "${YELLOW}Creating AppImage (this might take a moment)...${NC}"
-    ARCH=x86_64 ./appimagetool-x86_64.AppImage AppDir --verbose
+chmod +x build/flatpak/files/proton-drive-bridge
+echo -e "${YELLOW}Created Flatpak files${NC}"
 
-    if [ -f Proton_Drive_Bridge-x86_64.AppImage ]; then
-        # Set permissions
-        chmod +x Proton_Drive_Bridge-x86_64.AppImage
-        
-        echo -e "${GREEN}AppImage creation complete!${NC}"
-        echo -e "${YELLOW}AppImage location: Proton_Drive_Bridge-x86_64.AppImage${NC}"
-
-        # Ask if user wants to run the AppImage
-        echo " "
-        read -p "Would you like to run the AppImage? (y/n) " run_choice
-        case "$run_choice" in
-          y|Y )
-            echo -e "${GREEN}Starting AppImage...${NC}"
-            ./Proton_Drive_Bridge-x86_64.AppImage
-            ;;
-        esac
-    else
-        echo -e "${RED}Failed to create AppImage${NC}"
-        echo -e "${YELLOW}Check the output above for errors${NC}"
-    fi
+# Build Flatpak
+echo " "
+read -p "Would you like to build the Flatpak? (y/n) " flatpak_choice
+case "$flatpak_choice" in
+  y|Y )
+    echo -e "${GREEN}Building Flatpak...${NC}"
+    
+    # Ensure we're in the right directory
+    cd build/flatpak || {
+        echo -e "${RED}Failed to enter flatpak directory${NC}"
+        exit 1
+    }
+    
+    # Create build directory with proper permissions
+    rm -rf build-dir/
+    mkdir -p build-dir
+    set_permissions build-dir
+    
+    # Remove old .flatpak-builder directory if it exists
+    sudo rm -rf ~/.local/share/flatpak-builder
+    
+    # Build and install the Flatpak
+    flatpak-builder --user --force-clean build-dir org.proton.drive.bridge.yml || {
+        echo -e "${RED}Flatpak build failed${NC}"
+        exit 1
+    }
+    
+    # Fix permissions for the .flatpak-builder directory
+    sudo chown -R $USER:$USER ~/.local/share/flatpak-builder
+    
+    echo -e "${GREEN}Flatpak build complete!${NC}"
+    
+    # Ask to run Flatpak
+    echo " "
+    read -p "Would you like to run the Flatpak? (y/n) " run_flatpak
+    case "$run_flatpak" in
+      y|Y )
+        echo -e "${GREEN}Starting Flatpak...${NC}"
+        flatpak run org.proton.drive.bridge
+        ;;
+    esac
     ;;
 esac
-
-# Convert SVG to PNG if needed
-if [ -f src/ui/assets/heart.svg ] && [ ! -f src/ui/assets/heart.png ]; then
-    convert src/ui/assets/heart.svg src/ui/assets/heart.png
-fi

@@ -30,17 +30,11 @@ case $OS in
             python3-gi-cairo \
             gir1.2-gtk-4.0 \
             git \
-            build-essential
-        ;;
-    "Fedora")
-        echo -e "${YELLOW}Installing dependencies for Fedora...${NC}"
-        sudo dnf install -y \
-            python3 \
-            python3-pip \
-            python3-gobject \
-            gtk4 \
-            git \
-            gcc
+            flatpak \
+            flatpak-builder
+        
+        # Add Flathub repository
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         ;;
     "Arch Linux")
         echo -e "${YELLOW}Installing dependencies for Arch Linux...${NC}"
@@ -50,32 +44,31 @@ case $OS in
             python-gobject \
             gtk4 \
             git \
-            base-devel
+            flatpak \
+            flatpak-builder
+        
+        # Add Flathub repository
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         ;;
     *)
         echo -e "${RED}Unsupported operating system: $OS${NC}"
-        echo "Please install the following packages manually:"
-        echo "- Python 3.8 or higher"
-        echo "- GTK 4.0"
-        echo "- PyGObject"
-        echo "- Git"
         exit 1
         ;;
 esac
 
-# Install Python dependencies
-echo -e "${YELLOW}Installing Python packages...${NC}"
-pip3 install --user PyGObject
+# Install GNOME Platform and SDK
+echo -e "${YELLOW}Installing GNOME Platform and SDK...${NC}"
+flatpak install -y flathub org.gnome.Platform//45 org.gnome.Sdk//45
 
 echo -e "${GREEN}Dependencies installation completed!${NC}"
 echo -e "You can now run ${YELLOW}./Build.sh${NC} to build the application."
-echo -e " " \
+echo -e " "
 
 # Ask if user wants to run Build.sh
 read -p "Do you want to run Build.sh now? (y/n) " choice
 case "$choice" in
-  y|Y ) 
+  y|Y )
     echo "Running Build.sh..."
-    sudo bash Build.sh
+    ./Build.sh
     ;;
 esac 

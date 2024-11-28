@@ -1,14 +1,6 @@
 # Build directories
 build/
-dist/
-AppDir/
-
-# AppImage files
-*.AppImage
-appimagetool*
-
-# PyInstaller files
-*.spec
+.flatpak-builder/
 
 # Python cache
 __pycache__/
@@ -20,16 +12,4 @@ __pycache__/
 
 # System files
 .DS_Store
-Thumbs.db
-
-# Backup files
-*~
-*.bak
-
-# Environment files
-venv/
-env/
-
-# OS specific files
-*.log
-*.sqlite 
+Thumbs.db 
