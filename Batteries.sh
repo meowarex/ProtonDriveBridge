@@ -67,4 +67,13 @@ echo -e "${YELLOW}Installing Python packages...${NC}"
 pip3 install --user PyGObject
 
 echo -e "${GREEN}Dependencies installation completed!${NC}"
-echo -e "You can now run ${YELLOW}./Build.sh${NC} to build the application." 
+echo -e "You can now run ${YELLOW}./Build.sh${NC} to build the application." \
+
+# Ask if user wants to run Build.sh
+read -p "Do you want to run Build.sh now? (y/n) " choice
+case "$choice" in
+  y|Y ) 
+    echo "Running Build.sh..."
+    sudo bash Build.sh
+    ;;
+esac 
