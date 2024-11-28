@@ -1,5 +1,7 @@
 # Proton Drive Bridge
 
+![Logo](https://github.com/meowarex/ProtonDriveBridge/blob/GTK-Python-Rewrite/src/ui/assets/bridge.png?raw=true)
+
 A modern GTK4 application that helps you synchronize files from Other Cloud Providers to Proton Drive <3
 
 ## Features
