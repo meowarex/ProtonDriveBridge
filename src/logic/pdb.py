@@ -98,7 +98,7 @@ class PdbApp(Gtk.Application):
             if button == self.page1_button:
                 self.page2_button.set_active(False)
             else:
-                self.page1_button.set_active(False)
+                self.page1_button.set_active(False) 
         
     def on_url_button_clicked(self, button, url):
         webbrowser.open(url)
